@@ -1,21 +1,17 @@
 const inquirer = require('inquirer');
 
-// const fs = require('fs');
+const fs = require('fs');
 
-// const generatePage = require('./src/page-template.js');
+const generatePage = require('./src/page-template.js');
 
-// const pageHTML = generatePage(name, github);
-//   fs.writeFile('index.html', generatePage(name, github), err => {
-//     if (err) throw err;
+const { writeFile, copyFile } = require('./utils/generate-site.js');
 
-//     console.log('portfolio complete! Check out index.html to see the output!')
-//   })
 const promptUser = () => {
   return inquirer.prompt([  
     {
       type: 'input',
       name: 'name',
-      message: 'What is your name?',
+      message: 'What is your name?(required)',
       validate: nameInput => {
         if (nameInput) {
           return true;
@@ -28,7 +24,7 @@ const promptUser = () => {
     {
       type: 'input',
       name: 'github',
-      message: 'Enter your gihub user name',
+      message: 'Enter your github user name(required)',
       validate: githubInput => {
         if (githubInput) {
           return true;
@@ -73,7 +69,7 @@ const promptProject = portfolioData => {
     {
       type: 'input',
       name: 'name',
-      message: 'What is the name of your project',
+      message: 'What is the name of your project(required)',
       validate: projectInput => {
         if (projectInput) {
           return true;
@@ -141,5 +137,18 @@ const promptProject = portfolioData => {
 promptUser()
   .then(promptProject)
   .then(portfolioData => {
-    console.log(portfolioData);
+    return generatePage(portfolioData);
+  })
+  .then(pageHTML => {
+    return writeFile(pageHTML);
+  })
+  .then(writeFileResponse => {
+    console.log(writeFileResponse);
+    return copyFile();
+  })
+  .then(copyFileResponse => {
+    console.log(copyFileResponse);
+  })
+  .catch(err => {
+    console.log(err);
   });
